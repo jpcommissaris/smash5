@@ -14,6 +14,25 @@ canv.height = window.innerHeight;
 
 let players = [null]
 
+class RigidBody {
+    constructor(x, y, w, h){
+        this.x = x;
+        this.y = y;
+        this.width = w;
+        this.height = h;
+    }
+
+}
+
+function drawStage(){
+
+    MainStage = new RigidBody(10,400,400,100)
+
+    ctx.fillStyle = "white"
+    ctx.strokeRect(50,50,100,100);
+    ctx.fillRect(100,100,100,100); 
+}
+
 function gameloop() {
     socket.on('data', (data) => {
         handleGraphics(); 
@@ -32,6 +51,8 @@ function startGame() {
     // add player
     socket.emit('addplayer', {playerName: playerName}); //sends json
 
+
+    drawStage()
     gameloop();     
     
 }
@@ -79,6 +100,7 @@ window.addEventListener('resize', () => {
     size = canv.width/(tc[0]+2)
     sizeH = canv.height/(tc[1]+2)
     gameRect = [size, size, size*tc[0], size*tc[1]];
+    drawStage()
 }, true);
 
 
