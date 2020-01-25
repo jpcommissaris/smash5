@@ -39,11 +39,13 @@ class RigidBody {
 
 
 class Player {
-  constructor(xPos, yPos, xVelocity, yVelocity){
+  constructor(xPos, yPos, xVelocity, yVelocity, name, id){
       this.xPos = xPos;
       this.yPos = yPos;
       this.xVelocity = xVelocity;
       this.yVelocity = yVelocity;
+      this.name = name;
+      this.id = id; 
   }
   moveRight() {
       this.xPos += this.xVelocity;
@@ -56,9 +58,9 @@ class Player {
   }
 }
 
-function createPlayer() {
-  p1 = new Player(20, 20, 0, 1);
-  players.push(p1);
+function createPlayer(name, id) {
+  p1 = new Player(20, 20, 0, 1, name, id);
+  return p1;
 }
 
 function createMap(){
@@ -73,8 +75,10 @@ function checkCollision(player){
 setInterval(handleLogic, 1000/10);
 function handleLogic() {
   players.forEach(player => {
-    player.xPos += player.xVelocity;
-    player.yPos += player.yVelocity;
+    if(player){
+      player.xPos += player.xVelocity;
+      player.yPos += player.yVelocity;
+    }
   })
   update();
 
@@ -103,7 +107,7 @@ function addPlayer(data){
     if(players[i] === null){
       console.log('User joined game'); 
       players[i] = createPlayer(data.playerName, this.id);
-      this.emit('pn', i)
+      this.emit('pn', i);
       clients++;
       break;
     }

@@ -39,8 +39,11 @@ function gameloop() {
 function handleGraphics() {
     drawStage();
     players.forEach((p1) => {
-        ctx.fillStyle = 'red';
-        ctx.fillRect(p1.xPos, p1.yPos, 20, 20);
+        if(p1){
+            ctx.fillStyle = 'red';
+            ctx.fillRect(p1.xPos, p1.yPos, 20, 20);
+        }
+        
     })
 }
 
