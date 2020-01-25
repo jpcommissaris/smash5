@@ -8,6 +8,7 @@ const config  = require('./config.json');
 const MAX_CONNS = 8; 
 
 const Rigidbodies = []; 
+const players = [];
 
 
 class RigidBody {
@@ -35,6 +36,30 @@ class RigidBody {
 
 }
 
+
+class Player {
+  constructor(xPos, yPos, xVelocity, yVelocity){
+      this.xPos = xPos;
+      this.yPos = yPos;
+      this.xVelocity = xVelocity;
+      this.yVelocity = yVelocity;
+  }
+  moveRight() {
+      this.xPos += this.xVelocity;
+  }
+  moveLeft() {
+      this.xPos -= this.xVelocity;
+  }
+  jump() {
+      this.yPos 
+  }
+}
+
+function createPlayer() {
+  p1 = new Player(20, 20, 0, 1);
+  players.push(p1);
+}
+
 function createMap(){
   f1 = new RigidBody('mf', 'white')
   Rigidbodies.push(f1);
@@ -44,7 +69,15 @@ function checkCollision(player){
 
 }
 
+setInterval(handleLogic, 1000/10);
+function handleLogic() {
+  players.forEach(player => {
+    player.xPos += player.xVelocity;
+    player.yPos += player.yVelocity;
+  })
+  update();
 
+}
 //setup server
 app.use(express.static(__dirname + '/../client'));
 
@@ -58,12 +91,18 @@ http.listen(serverPort, () => {
 io.on('connection', (socket) => {
   console.log('New connection with id ' + socket.id)
   socket.on('addplayer', addPlayer); 
+  socket.on('update', update);
 });
 
 //adds info to player 
 function addPlayer(data){
   this.emit('stage', Rigidbodies)
   console.log('User joined game'); 
+  createPlayer();
+}
+
+function update(data) {
+  io.emit('data', players);
 }
 
 
