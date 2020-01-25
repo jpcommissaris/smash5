@@ -5,10 +5,11 @@ const app     = express();
 const http    = require('http').Server(app);
 const io  = require('socket.io')(http);
 const config  = require('./config.json');
-const MAX_CONNS = 8; 
+const MAX_CONNS = 4; 
 
 const Rigidbodies = []; 
-const players = [];
+const players = [null, null, null, null];
+let clients = 0; 
 
 
 class RigidBody {
@@ -92,18 +93,44 @@ io.on('connection', (socket) => {
   console.log('New connection with id ' + socket.id)
   socket.on('addplayer', addPlayer); 
   socket.on('update', update);
+  socket.on('disconnect', disconnect)
 });
 
 //adds info to player 
 function addPlayer(data){
   this.emit('stage', Rigidbodies)
-  console.log('User joined game'); 
-  createPlayer();
+  for(let i = 0; i < MAX_CONNS; i++){
+    if(players[i] === null){
+      console.log('User joined game'); 
+      players[i] = createPlayer(data.playerName, this.id);
+      this.emit('pn', i)
+      clients++;
+      break;
+    }
+  }
 }
+
+//disconnect a player
+function disconnect(){
+  for(let i = 0; i < players.length; i++){
+    if(players[i]){
+      //console.log('client', client.id, this.id); 
+      if(players[i].id === this.id){ 
+        console.log('A user disconnected with id: ', players[i].id);
+        players[i] = null;
+        clients--; 
+        break; 
+      }
+    }
+  } 
+  //console.log(players)
+}; 
+
 
 function update(data) {
   io.emit('data', players);
 }
+
 
 
 
