@@ -14,6 +14,7 @@ canv.height = window.innerHeight;
 
 let players = [];
 let RigidBodies = [];
+let pn = null; 
 
 
 
@@ -38,8 +39,11 @@ function gameloop() {
 function handleGraphics() {
     drawStage();
     players.forEach((p1) => {
-        ctx.fillStyle = 'red';
-        ctx.fillRect(p1.xPos, p1.yPos, 20, 20);
+        if(p1){
+            ctx.fillStyle = 'red';
+            ctx.fillRect(p1.xPos, p1.yPos, 20, 20);
+        }
+        
     })
 }
 
@@ -52,11 +56,15 @@ function startGame() {
     document.getElementById('gameAreaWrapper').style.display = 'block';
     document.getElementById('startMenuWrapper').style.display = 'none';
     // add player, draw stage
+    window.addEventListener('keydown', handleKeys); 
     socket.emit('addplayer', {playerName: playerName}); //sends json
     socket.on('stage', (data) => {
         console.log(data)
         RigidBodies = data;
         drawStage();
+    })
+    socket.on('pn', (data) => {
+        pn = data; 
     })
     
     gameloop();     
@@ -99,6 +107,34 @@ window.onload = function() {
 
 
 // -- event listeners --
+
+
+
+function handleKeys(){
+    let vx = players[pn].vx
+    let vy = players[playernum].vy
+      if(this.playernum != -1){
+          switch(evt.keyCode){
+              case 65: //left
+                  if(vx != 1){
+                      vx=-1; vy=0;
+                  } break;
+              case 87: //up
+                  if(vy != 1){
+                      vx=0; vy=-1;
+                  } break;
+              case 68://right
+                  if(vx != -1){
+                      vx=1; vy=0; 
+                  } break;
+              case 83: //down
+                  if(vy != -1){
+                      vx=0; vy=1;
+                  } break;
+          }
+      }
+      socket.emit('update', {vx: vx, vy: vy, pn: playernum}); 
+  }
 
 window.addEventListener('resize', () => {
     canv.width = window.innerWidth;

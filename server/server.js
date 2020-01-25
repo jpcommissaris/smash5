@@ -5,10 +5,11 @@ const app     = express();
 const http    = require('http').Server(app);
 const io  = require('socket.io')(http);
 const config  = require('./config.json');
-const MAX_CONNS = 8; 
+const MAX_CONNS = 4; 
 
 const Rigidbodies = []; 
-const players = [];
+const players = [null, null, null, null];
+let clients = 0; 
 
 
 class RigidBody {
@@ -38,11 +39,13 @@ class RigidBody {
 
 
 class Player {
-  constructor(xPos, yPos, xVelocity, yVelocity){
+  constructor(xPos, yPos, xVelocity, yVelocity, name, id){
       this.xPos = xPos;
       this.yPos = yPos;
       this.xVelocity = xVelocity;
       this.yVelocity = yVelocity;
+      this.name = name;
+      this.id = id; 
   }
   moveRight() {
       this.xPos += this.xVelocity;
@@ -55,9 +58,9 @@ class Player {
   }
 }
 
-function createPlayer() {
-  p1 = new Player(20, 20, 0, 1);
-  players.push(p1);
+function createPlayer(name, id) {
+  p1 = new Player(20, 20, 0, 1, name, id);
+  return p1;
 }
 
 function createMap(){
@@ -72,8 +75,10 @@ function checkCollision(player){
 setInterval(handleLogic, 1000/10);
 function handleLogic() {
   players.forEach(player => {
-    player.xPos += player.xVelocity;
-    player.yPos += player.yVelocity;
+    if(player){
+      player.xPos += player.xVelocity;
+      player.yPos += player.yVelocity;
+    }
   })
   update();
 
@@ -92,18 +97,44 @@ io.on('connection', (socket) => {
   console.log('New connection with id ' + socket.id)
   socket.on('addplayer', addPlayer); 
   socket.on('update', update);
+  socket.on('disconnect', disconnect)
 });
 
 //adds info to player 
 function addPlayer(data){
   this.emit('stage', Rigidbodies)
-  console.log('User joined game'); 
-  createPlayer();
+  for(let i = 0; i < MAX_CONNS; i++){
+    if(players[i] === null){
+      console.log('User joined game'); 
+      players[i] = createPlayer(data.playerName, this.id);
+      this.emit('pn', i);
+      clients++;
+      break;
+    }
+  }
 }
+
+//disconnect a player
+function disconnect(){
+  for(let i = 0; i < players.length; i++){
+    if(players[i]){
+      //console.log('client', client.id, this.id); 
+      if(players[i].id === this.id){ 
+        console.log('A user disconnected with id: ', players[i].id);
+        players[i] = null;
+        clients--; 
+        break; 
+      }
+    }
+  } 
+  //console.log(players)
+}; 
+
 
 function update(data) {
   io.emit('data', players);
 }
+
 
 
 
