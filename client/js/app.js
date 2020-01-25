@@ -130,7 +130,7 @@ function handleKeyDown(evt){
                 break;
           }
       }
-      console.log(vx, vy, pn)
+      //console.log(vx, vy, pn)
       socket.emit('update', {vx: vx, vy: vy, pn: pn}); 
   }
 
