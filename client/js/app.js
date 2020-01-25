@@ -13,28 +13,23 @@ canv.width = window.innerWidth;
 canv.height = window.innerHeight;
 
 let players = [null]
+let RigidBodies = []
 
-class RigidBody {
-    constructor(x, y, w, h){
-        this.x = x;
-        this.y = y;
-        this.width = w;
-        this.height = h;
-    }
 
-}
+
 
 function drawStage(){
 
-    MainStage = new RigidBody(10,400,400,100)
+    RigidBodies.forEach(body =>{
+        ctx.fillStyle = body.color
+        ctx.fillRect(body.x, body.y, body.width, body.height); 
+    })
 
-    ctx.fillStyle = "white"
-    ctx.strokeRect(50,50,100,100);
-    ctx.fillRect(100,100,100,100); 
 }
 
 function gameloop() {
     socket.on('data', (data) => {
+        drawStage();
         handleGraphics(); 
     }); 
 }
@@ -48,11 +43,14 @@ function startGame() {
     playerName = playerNameInput.value.replace(/(<([^>]+)>)/ig, '');
     document.getElementById('gameAreaWrapper').style.display = 'block';
     document.getElementById('startMenuWrapper').style.display = 'none';
-    // add player
+    // add player, draw stage
     socket.emit('addplayer', {playerName: playerName}); //sends json
-
-
-    drawStage()
+    socket.on('stage', (data) => {
+        console.log(data)
+        RigidBodies = data;
+        drawStage()
+    })
+    
     gameloop();     
     
 }
