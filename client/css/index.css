@@ -1,0 +1,91 @@
+html, body {
+	margin: 0; padding: 0;
+	width: 100%; height: 100%;
+	background-color: black;
+	overflow: hidden;
+	font-family: Arial, sans-serif;
+	font-size: 14px;
+}
+
+canvas {
+	width: 100%; height: 100%;
+	margin: 0; padding: 0;
+}
+
+#startMenu {
+	margin:auto;
+	margin-top:100px;
+	width: 300px;
+	padding: 20px;
+	border-radius: 5px 5px 5px 5px;
+	-moz-border-radius: 5px 5px 5px 5px;
+	background-color: rgb(26, 26, 139);
+	box-sizing: border-box;
+}
+
+#startMenu p {
+	padding: 0;
+	color: rgb(228, 228, 228);
+	text-align:center;
+	font-size: x-large;
+	font-weight: bold;
+}
+
+#playerNameInput {
+	width: 100%;
+	text-align: center;
+	padding: 10px;
+	border: solid 1px #dcdcdc;
+	box-sizing: border-box;
+	border-radius: 5px 5px 5px 5px;
+	-moz-border-radius: 5px 5px 5px 5px;
+	margin-bottom: 10px;
+	outline: none;
+}
+
+#playerNameInput:focus, #playerNameInput.focus {
+	border: solid 1px #CCCCCC;
+	box-shadow: 0 0 3px 1px #DDDDDD;
+}
+
+#startButton {
+	position: relative;
+	margin: auto;
+	width: 100%;
+	height: 40px;
+	margin-top: 10px;
+	box-sizing: border-box;
+	font-size: 18px;
+	color: white;
+	text-align: center;
+	text-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
+	background: #2ecc71;
+	border: 0;
+	cursor: pointer;
+	border-radius: 5px 5px 5px 5px;
+	-moz-border-radius: 5px 5px 5px 5px;
+	-webkit-border-radius: 5px 5px 5px 5px;
+	margin-bottom: 10px;
+}
+
+#startButton:active, #startButton:hover {
+	background: rgb(21, 116, 61);
+}
+
+#startMenu h3 {
+	padding-bottom: 0;
+	margin-bottom: 0;
+}
+
+#startMenu ul {
+	margin: 10px; padding: 10px;
+	margin-top: 0;
+}
+
+#startMenu .input-error {
+	position: relative;
+	color : red;
+	display: none;
+	text-align: center;
+	font-size : 12px;
+}

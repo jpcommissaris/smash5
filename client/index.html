@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Snake</title>
+    <link rel="stylesheet" href="/css/index.css" />
+</head>
+<body>
+    <div id="gameAreaWrapper" style="display:none;">
+        <canvas tabindex="1" id="cvs"></canvas>
+
+    </div>
+    <div id="startMenuWrapper">
+        <div id="startMenu">
+            <p>Snake Online</p>
+            <p style = "font-size: 12px; margin-top: -12px;"  >BE THE LAST ALIVE TO EARN POINTS!!</p>
+            <input type="text" tabindex="0" autofocus placeholder="nickname" id="playerNameInput" />
+            <b class="input-error">Letters and numbers only</b>
+            <br />
+            <button id="startButton">Play</button>
+        </div>
+    </div>
+    
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="./js/game.js"></script>
+    <script src="./js/app.js"></script>
+</body>
+</html>
