@@ -43,22 +43,25 @@ class RigidBody {
 
 
 class Player {
-  constructor(xPos, yPos, xVelocity, yVelocity, name, id){
+  constructor(xPos, yPos, xVelocity, yVelocity, name, id, jump){
       this.xPos = xPos;
       this.yPos = yPos;
       this.xVelocity = xVelocity;
       this.yVelocity = yVelocity;
       this.name = name;
       this.id = id; 
+      this.jump = jump;
   }
-  moveRight() {
+  move() {
       this.xPos += this.xVelocity;
+      this.yPos += this.yVelocity;
+      this.yVelocity += 0.2
   }
-  moveLeft() {
-      this.xPos -= this.xVelocity;
-  }
-  jump() {
-      this.yPos 
+  jump1() {
+    if(this.jump > 0){
+      this.yVelocity -= 3
+      this.jump -= 1
+    }
   }
 }
 
@@ -92,7 +95,7 @@ function checkCollisionY(player){
   return false;
 }
 
-setInterval(handleLogic, 1000/10);
+setInterval(handleLogic, 1000/30);
 function handleLogic() {
   players.forEach(player => {
     if(player){
@@ -157,7 +160,8 @@ function disconnect(){
 
 function update(data) {
   players[data.pn].xVelocity = data.vx
-  players[data.pn].yVelocity = data.vy
+  players[data.pn].jump = data.jump
+  console.log(data.jump)
   io.emit('data', players);
 }
 
