@@ -56,7 +56,8 @@ function startGame() {
     document.getElementById('gameAreaWrapper').style.display = 'block';
     document.getElementById('startMenuWrapper').style.display = 'none';
     // add player, draw stage
-    window.addEventListener('keydown', handleKeys); 
+    window.addEventListener('keydown', handleKeyDown); 
+    window.addEventListener('keyup', handleKeyUp); 
     socket.emit('addplayer', {playerName: playerName}); //sends json
     socket.on('stage', (data) => {
         console.log(data)
@@ -110,30 +111,38 @@ window.onload = function() {
 
 
 
-function handleKeys(){
-    let vx = players[pn].vx
-    let vy = players[playernum].vy
-      if(this.playernum != -1){
+function handleKeyDown(evt){
+    let vx = players[pn].xVelocity
+    let vy = players[pn].yVelocity
+    if(this.playernum != -1){
           switch(evt.keyCode){
               case 65: //left
-                  if(vx != 1){
-                      vx=-1; vy=0;
-                  } break;
+                vx = -5; 
+                break;
               case 87: //up
-                  if(vy != 1){
-                      vx=0; vy=-1;
-                  } break;
+                vy = -5; 
+                break;
               case 68://right
-                  if(vx != -1){
-                      vx=1; vy=0; 
-                  } break;
+                vx = 5; 
+                break;
               case 83: //down
-                  if(vy != -1){
-                      vx=0; vy=1;
-                  } break;
+                vy = 2; 
+                break;
           }
       }
-      socket.emit('update', {vx: vx, vy: vy, pn: playernum}); 
+      //console.log(vx, vy, pn)
+      socket.emit('update', {vx: vx, vy: vy, pn: pn}); 
+  }
+
+  function handleKeyUp(evt){
+    let vx = players[pn].xVelocity
+    let vy = players[pn].yVelocity
+    if(this.playernum != -1){
+        vx = 0
+        vy = 1
+    }
+    console.log(vx, vy, pn)
+    socket.emit('update', {vx: vx, vy: vy, pn: pn}); 
   }
 
 window.addEventListener('resize', () => {

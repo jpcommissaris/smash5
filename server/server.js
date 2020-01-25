@@ -80,7 +80,7 @@ function handleLogic() {
       player.yPos += player.yVelocity;
     }
   })
-  update();
+  io.emit('data', players);
 
 }
 //setup server
@@ -132,6 +132,8 @@ function disconnect(){
 
 
 function update(data) {
+  players[data.pn].xVelocity = data.vx
+  players[data.pn].yVelocity = data.vy
   io.emit('data', players);
 }
 
