@@ -29,8 +29,7 @@ function drawStage(){
     MainStage = new RigidBody(10,400,400,100)
 
     ctx.fillStyle = "white"
-    ctx.strokeRect(50,50,100,100);
-    ctx.fillRect(100,100,100,100); 
+    ctx.fillRect(MainStage.x, MainStage.y, MainStage.width, MainStage.height); 
 }
 
 function gameloop() {
