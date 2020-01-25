@@ -74,37 +74,44 @@ function createMap(){
   f1 = new RigidBody('mf', 'white');
   Rigidbodies.push(f1);
   for(let i = 1; i < 9; i++){
-    Rigidbodies.push(new RigidBody('pf', 'green', i));
+    Rigidbodies.push(new RigidBody('pf', 'green', i))
   }
-  
+
 }
 
 function checkCollisionX(player){
-  Rigidbodies.forEach(platform => {
-    if(player.xPos + player.xVelocity >= platform.x + platform.width || player.yPos + player.yVelocity + playerSize <= platform.y) return false;
-    //if(player.xPos + playerSize + player.xVelocity >= platform.x || player.xPos + player.xVelocity <= platform.x + platform.width) return true;
-    })
-    return true;
+  
 }
 
-function checkCollisionY(player){
+function checkCollisionTop(player){
+  let b = false
   Rigidbodies.forEach(platform => {
-    if(!(player.yPos + player.yVelocity >= platform.y + platform.height || player.yPos + player.yVelocity + playerSize <= platform.y)) return true;
-    //if(player.yPos + playerSize + player.yVelocity >= platform.y && player.yPos + playerSize + player.yVelocity <= platform.y + platform.height) return true;
-  })
-  return false;
+    let moved = player.yPos + player.yVelocity; 
+    if(lineInt(player.xPos, moved, player.xPos, moved + playerSize, 
+      platform.x, platform.y, platform.x+platform.width, platform.y)){
+      b = true; 
+      return; 
+    } 
+    if(lineInt(player.xPos+playerSize, moved, player.xPos+playerSize, moved + playerSize, 
+      platform.x, platform.y, platform.x+platform.width, platform.y)){
+      b = true;
+      return;
+    } 
+  });
+  return b; 
+  
 }
 
 setInterval(handleLogic, 1000/30);
+
 function handleLogic() {
   players.forEach(player => {
     if(player){
-      if(checkCollisionX(player) == false){
-        player.xPos += player.xVelocity;
-      }
-      if(checkCollisionY(player) == false){
+      if(!checkCollisionTop(player)){
         player.yPos += player.yVelocity;
       }
+      player.xPos += player.xVelocity;
+      
     }
   })
   io.emit('data', players);
@@ -164,6 +171,19 @@ function update(data) {
   console.log(data.jump)
   io.emit('data', players);
 }
+
+// returns true iff the line from (a,b)->(c,d) intersects with (p,q)->(r,s)
+function lineInt(a,b,c,d,p,q,r,s) {
+  var det, gamma, lambda;
+  det = (c - a) * (s - q) - (r - p) * (d - b);
+  if (det === 0) {
+    return false;
+  } else {
+    lambda = ((s - q) * (r - a) + (p - r) * (s - b)) / det;
+    gamma = ((b - d) * (r - a) + (c - a) * (s - b)) / det;
+    return (0 < lambda && lambda < 1) && (0 < gamma && gamma < 1);
+  }
+};
 
 
 
