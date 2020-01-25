@@ -12,14 +12,15 @@ ctx.font = '28px Arial';
 canv.width = window.innerWidth;
 canv.height = window.innerHeight;
 
-let players = [null]
-let RigidBodies = []
+let players = [];
+let RigidBodies = [];
 
 
 
 
 function drawStage(){
-
+    ctx.fillStyle = "black";
+    ctx.fillRect(0, 0, canv.width, canv.height);
     RigidBodies.forEach(body =>{
         ctx.fillStyle = body.color
         ctx.fillRect(body.x, body.y, body.width, body.height); 
@@ -29,11 +30,18 @@ function drawStage(){
 
 function gameloop() {
     socket.on('data', (data) => {
-        drawStage();
+        players = data;
         handleGraphics(); 
     }); 
 }
 
+function handleGraphics() {
+    drawStage();
+    players.forEach((p1) => {
+        ctx.fillStyle = 'red';
+        ctx.fillRect(p1.xPos, p1.yPos, 20, 20);
+    })
+}
 
 
 
@@ -48,7 +56,7 @@ function startGame() {
     socket.on('stage', (data) => {
         console.log(data)
         RigidBodies = data;
-        drawStage()
+        drawStage();
     })
     
     gameloop();     
