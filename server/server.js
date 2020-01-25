@@ -8,9 +8,6 @@ const config  = require('./config.json');
 const MAX_CONNS = 8; 
 
 
-
-  
-
 //setup server
 app.use(express.static(__dirname + '/../client'));
 
@@ -21,8 +18,7 @@ http.listen(serverPort, () => {
 
 
 io.on('connection', (socket) => {
-  console.log('New connection with id ' +socket.id)
-  
+  console.log('New connection with id ' + socket.id)
 });
 
 
