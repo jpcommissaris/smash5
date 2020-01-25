@@ -154,9 +154,3 @@ window.addEventListener('resize', () => {
     drawStage()
 }, true);
 
-
-
-
-
-
-

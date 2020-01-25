@@ -20,7 +20,7 @@ class RigidBody {
         this.create(0,600,900,100, false, false, false);
       }
       else if(type === 'pf'){
-        this.create(num*100, num*100, 50, 10, false, false, false);
+        this.create(num*100-(num%4)*25, 300+(num%3)*100, 100, 10, false, false, false);
       }
       
       //style
@@ -40,7 +40,6 @@ class RigidBody {
   }
 
 }
-
 
 class Player {
   constructor(xPos, yPos, xVelocity, yVelocity, name, id){
@@ -78,30 +77,34 @@ function createMap(){
 
 function checkCollisionX(player){
   Rigidbodies.forEach(platform => {
-    if(player.xPos + player.xVelocity >= platform.x + platform.width || player.yPos + player.yVelocity + playerSize <= platform.y) return false;
-    //if(player.xPos + playerSize + player.xVelocity >= platform.x || player.xPos + player.xVelocity <= platform.x + platform.width) return true;
-    })
-    return true;
+    if(player.xPos + playerSize + player.xVelocity >= platform.x || player.xPos + player.xVelocity <= platform.x + platform.width) return true;
+    //return (player.xPos + playerSize + player.xVelocity >= platform.x || player.xPos + player.xVelocity <= platform.x + platform.width);
+  })
+  return true;
+  return false;
 }
 
 function checkCollisionY(player){
   Rigidbodies.forEach(platform => {
-    if(!(player.yPos + player.yVelocity >= platform.y + platform.height || player.yPos + player.yVelocity + playerSize <= platform.y)) return true;
-    //if(player.yPos + playerSize + player.yVelocity >= platform.y && player.yPos + playerSize + player.yVelocity <= platform.y + platform.height) return true;
+    if(player.yPos + playerSize + player.yVelocity >= platform.y && player.yPos + player.yVelocity <= platform.y + platform.height) return true;
+    //return (player.yPos + playerSize + player.yVelocity >= platform.y && player.yPos + player.yVelocity <= platform.y + platform.height);
   })
+  return true;
   return false;
 }
 
-setInterval(handleLogic, 1000/10);
+setInterval(handleLogic, 1000/30);
 function handleLogic() {
   players.forEach(player => {
     if(player){
-      if(checkCollisionX(player) == false){
+      if(checkCollisionX(player) === false){
         player.xPos += player.xVelocity;
       }
-      if(checkCollisionY(player) == false){
+      else console.log('x')
+      if(checkCollisionY(player) === false){
         player.yPos += player.yVelocity;
       }
+      else console.log('y');
     }
   })
   io.emit('data', players);
