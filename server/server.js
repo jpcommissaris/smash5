@@ -11,12 +11,16 @@ const Rigidbodies = [];
 const players = [null, null, null, null];
 let clients = 0; 
 
+const playerSize = 40;
 
 class RigidBody {
-  constructor(type = 'mf', color = 'white'){
+  constructor(type = 'mf', color = 'white', num = 0){
       //type
       if(type === 'mf'){
-        this.create(100,600,900,100, false, false, false);
+        this.create(0,600,900,100, false, false, false);
+      }
+      else if(type === 'pf'){
+        this.create(num*100, num*100, 50, 10, false, false, false);
       }
       
       //style
@@ -59,25 +63,45 @@ class Player {
 }
 
 function createPlayer(name, id) {
-  p1 = new Player(20, 20, 0, 1, name, id);
+  p1 = new Player(50 + (clients*200), 500, 0, 1, name, id);
   return p1;
 }
 
 function createMap(){
-  f1 = new RigidBody('mf', 'white')
+  f1 = new RigidBody('mf', 'white');
   Rigidbodies.push(f1);
+  for(let i = 1; i < 9; i++){
+    Rigidbodies.push(new RigidBody('pf', 'green', i));
+  }
+  
 }
 
-function checkCollision(player){
+function checkCollisionX(player){
+  Rigidbodies.forEach(platform => {
+    if(player.xPos + player.xVelocity >= platform.x + platform.width || player.yPos + player.yVelocity + playerSize <= platform.y) return false;
+    //if(player.xPos + playerSize + player.xVelocity >= platform.x || player.xPos + player.xVelocity <= platform.x + platform.width) return true;
+    })
+    return true;
+}
 
+function checkCollisionY(player){
+  Rigidbodies.forEach(platform => {
+    if(!(player.yPos + player.yVelocity >= platform.y + platform.height || player.yPos + player.yVelocity + playerSize <= platform.y)) return true;
+    //if(player.yPos + playerSize + player.yVelocity >= platform.y && player.yPos + playerSize + player.yVelocity <= platform.y + platform.height) return true;
+  })
+  return false;
 }
 
 setInterval(handleLogic, 1000/10);
 function handleLogic() {
   players.forEach(player => {
     if(player){
-      player.xPos += player.xVelocity;
-      player.yPos += player.yVelocity;
+      if(checkCollisionX(player) == false){
+        player.xPos += player.xVelocity;
+      }
+      if(checkCollisionY(player) == false){
+        player.yPos += player.yVelocity;
+      }
     }
   })
   io.emit('data', players);
