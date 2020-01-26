@@ -49,6 +49,8 @@ class Player {
       this.yVelocity = yVelocity;
       this.name = name;
       this.id = id; 
+      this.jump = 0;
+      this.grounded = false; 
   }
   moveX() {
       this.xPos += this.xVelocity;
@@ -62,7 +64,7 @@ class Player {
   }
   jump1() {
     if(this.jump > 0){
-      this.yVelocity -= 3
+      this.yVelocity -= this.jump
       this.jump -= 1
     }
   }
@@ -96,6 +98,7 @@ function checkCollisionTop(player){
       return;
     } 
   });
+  player.grounded = b; 
   return b; 
 }
 
@@ -166,8 +169,8 @@ function disconnect(){
 
 function update(data) {
   players[data.pn].xVelocity = data.vx
+  //players[data.pn].yVelocity = data.vy
   players[data.pn].jump = data.jump
-  console.log(data.vx, data.jump)
   io.emit('data', players);
 }
 

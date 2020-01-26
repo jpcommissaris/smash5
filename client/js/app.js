@@ -112,38 +112,39 @@ window.onload = function() {
 
 
 function handleKeyDown(evt){
-    let vx = players[pn].xVelocity
-    let jump = players[pn].jump
+    let vx = players[pn].xVelocity;
+    let vy = players[pn].yVelocity;
+    let jump = players[pn].jump;
+
     if(this.playernum != -1){
           switch(evt.keyCode){
               case 65: //left
                 vx = -5; 
                 break;
               case 87: //up
-                if(jump <= 5){
-                    jump += 1;
+                if(players[pn].grounded){
+                    jump = 5;
                 }
                 break;
               case 68://right
                 vx = 5; 
                 break;
               case 83: //down
-                vy = 1; 
+                vy += 1; 
                 break;
           }
       }
       //console.log(vx, vy, pn)
-      socket.emit('update', {vx: vx, jump: jump, pn: pn}); 
+      socket.emit('update', {vx: vx, vy: vy, jump: jump, pn: pn}); 
   }
 
   function handleKeyUp(evt){
     if(players[pn]){
-        let vx = players[pn].xVelocity
-        let jump = players[pn].jump
-        if(this.playernum != -1){
-            vx = 0
-            vy = 1
-        }
+        let vx = players[pn].xVelocity;
+        let jump = players[pn].jump;
+            if(evt.keyCode === 65 ||evt.keyCode === 68){
+                vx = 0
+            }
         socket.emit('update', {vx: vx, jump: jump, pn: pn}); 
     }
   }
