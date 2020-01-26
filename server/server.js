@@ -43,7 +43,7 @@ class RigidBody {
 }
 
 class Player {
-  constructor(xPos, yPos, xVelocity, yVelocity, name, id){
+  constructor(xPos, yPos, xVelocity, yVelocity, name, id, health){
       this.xPos = xPos;
       this.yPos = yPos;
       this.xVelocity = xVelocity;
@@ -51,8 +51,10 @@ class Player {
       this.name = name;
       this.id = id; 
       this.jump = 0;
+
       this.grounded = false; 
       this.reload = 6;
+      this.health = 100;
   }
   moveX() {
       this.xPos += this.xVelocity;
@@ -147,7 +149,8 @@ function checkCollisionLeft(player){
   Rigidbodies.forEach(platform => {
     let moved = player.xPos + player.xVelocity;
     if(lineInt(moved, player.yPos, moved, player.yPos+playerSize, 
-      platform.x, platform.y, platform.x+platform.width, platform.y)){
+      platform.x, platform.y, platform.x+platform.width, platform.y
+      )){
       b = true; 
       return; 
     } 

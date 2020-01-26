@@ -19,6 +19,7 @@ let RigidBodies = [];
 let bullets = [];
 let pn = null; 
 let center = {x: 0, y: 0}
+let playerSize = 40;
 
 const mouse = {x: 0, y: 0}
 
@@ -76,15 +77,16 @@ function handleGraphics() {
 
     players.forEach((p1) => {
         if(p1){
-            ctx.fillStyle = 'red';
-            ctx.fillRect(p1.xPos, p1.yPos, 40, 40);
+            ctx.fillStyle = 'yellow';
+            ctx.fillRect(p1.xPos, p1.yPos, playerSize, playerSize);
+            ctx.fillStyle = 'red'
+            ctx.fillRect(p1.xPos, p1.yPos-10, playerSize*(p1.health/100), 5);
+            ctx.fillStyle = "orange"
+            ctx.fillText(p1.name, p1.xPos, p1.yPos-14);
         }
-        
     })
     drawCursor(); 
 }
-
-
 
 // -- menu screen and setup -- 
 
