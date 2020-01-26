@@ -9,6 +9,7 @@ const MAX_CONNS = 4;
 
 const Rigidbodies = []; 
 const players = [null, null, null, null];
+const bullets = []; 
 let clients = 0; 
 
 const playerSize = 40;
@@ -50,7 +51,9 @@ class Player {
       this.name = name;
       this.id = id; 
       this.jump = 0;
-      this.grounded = false;
+
+      this.grounded = false; 
+      this.reload = 6;
       this.health = 100;
   }
   moveX() {
@@ -71,9 +74,29 @@ class Player {
   }
 }
 
+class Bullet{
+  constructor(xPos, yPos, xVelocity, yVelocity, pn){
+    this.xPos = xPos;
+    this.yPos = yPos;
+    this.xVelocity = xVelocity;
+    this.yVelocity = yVelocity;
+    this.pn = pn;
+    this.type = 0;
+  }
+  move() {
+    this.xPos += this.xVelocity;
+    this.yPos += this.yVelocity;
+    this.yVelocity += 0.1
+  }
+
+}
+
 function createPlayer(name, id) {
   p1 = new Player(50 + (clients*200), 500, 0, 1, name, id);
   return p1;
+}
+function createBullet(posX, posY, xVelocity, yVelocity, pn){
+  return new Bullet(posX, posY, xVelocity, yVelocity, pn)
 }
 
 function createMap(){
@@ -175,6 +198,12 @@ function handleLogic() {
       
     }
   })
+  bullets.forEach(bullet =>{
+    if(bullet){
+      bullet.move();
+    }
+  })
+  io.emit('bulletdata', bullets);
   io.emit('data', players);
 
 }
@@ -193,6 +222,7 @@ io.on('connection', (socket) => {
   socket.on('addplayer', addPlayer); 
   socket.on('update', update);
   socket.on('disconnect', disconnect)
+  socket.on('bullet', addBullet)
 });
 
 //adds info to player 
@@ -225,6 +255,9 @@ function disconnect(){
   //console.log(players)
 }; 
 
+function addBullet(data) {
+  bullets.push(createBullet(data.posX, data.posY, data.vx, data.vy, data.pn));
+}
 
 function update(data) {
   players[data.pn].xVelocity = data.vx
