@@ -203,6 +203,9 @@ function handleLogic() {
       bullet.move();
     }
   })
+  if(bullets.length > 20){
+    bullets.shift() //queue functionality
+  }
   io.emit('bulletdata', bullets);
   io.emit('data', players);
 
