@@ -50,8 +50,17 @@ class Player {
       this.name = name;
       this.id = id; 
   }
+<<<<<<< HEAD
   moveRight() {
       this.xPos += this.xVelocity;
+=======
+  moveX() {
+      this.xPos += this.xVelocity;
+  }
+  moveY(){
+    this.yPos += this.yVelocity;
+    this.yVelocity += 0.2
+>>>>>>> 11827653f83517417d262d90927342f5cdfe03f7
   }
   moveLeft() {
       this.xPos -= this.xVelocity;
@@ -95,6 +104,7 @@ setInterval(handleLogic, 1000/30);
 function handleLogic() {
   players.forEach(player => {
     if(player){
+<<<<<<< HEAD
       if(checkCollisionX(player) === false){
         player.xPos += player.xVelocity;
       }
@@ -103,6 +113,15 @@ function handleLogic() {
         player.yPos += player.yVelocity;
       }
       else console.log('y');
+=======
+      if(!checkCollisionTop(player)){
+        player.moveY();
+      }
+
+      player.moveX();
+      player.jump1();
+      
+>>>>>>> 11827653f83517417d262d90927342f5cdfe03f7
     }
   })
   io.emit('data', players);
@@ -158,7 +177,12 @@ function disconnect(){
 
 function update(data) {
   players[data.pn].xVelocity = data.vx
+<<<<<<< HEAD
   players[data.pn].yVelocity = data.vy
+=======
+  players[data.pn].jump = data.jump
+  console.log(data.vx, data.jump)
+>>>>>>> 11827653f83517417d262d90927342f5cdfe03f7
   io.emit('data', players);
 }
 

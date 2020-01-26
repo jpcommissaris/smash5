@@ -113,7 +113,6 @@ window.onload = function() {
 
 function handleKeyDown(evt){
     let vx = players[pn].xVelocity
-    let vy = players[pn].yVelocity
     let jump = players[pn].jump
     if(this.playernum != -1){
           switch(evt.keyCode){
@@ -138,12 +137,12 @@ function handleKeyDown(evt){
   }
 
   function handleKeyUp(evt){
-    let vx = players[pn].xVelocity
+    /*let vx = players[pn].xVelocity
     let jump = players[pn].jump
     if(this.playernum != -1){
         vx = 0
         vy = 1
-    }
+    }*/
     socket.emit('update', {vx: vx, jump: jump, pn: pn}); 
   }
 
