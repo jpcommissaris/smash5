@@ -50,23 +50,21 @@ class Player {
       this.name = name;
       this.id = id; 
   }
-<<<<<<< HEAD
-  moveRight() {
-      this.xPos += this.xVelocity;
-=======
   moveX() {
       this.xPos += this.xVelocity;
   }
   moveY(){
     this.yPos += this.yVelocity;
     this.yVelocity += 0.2
->>>>>>> 11827653f83517417d262d90927342f5cdfe03f7
   }
   moveLeft() {
       this.xPos -= this.xVelocity;
   }
-  jump() {
-      this.yPos 
+  jump1() {
+    if(this.jump > 0){
+      this.yVelocity -= 3
+      this.jump -= 1
+    }
   }
 }
 
@@ -83,37 +81,29 @@ function createMap(){
   }
   
 }
-
-function checkCollisionX(player){
-  return Rigidbodies.forEach(platform => {
-    if(player.xPos + playerSize + player.xVelocity >= platform.x || player.xPos + player.xVelocity <= platform.x + platform.width) return true;
-    //return (player.xPos + playerSize + player.xVelocity >= platform.x || player.xPos + player.xVelocity <= platform.x + platform.width);
-  })
-  return false;
-}
-
-function checkCollisionY(player){
+function checkCollisionTop(player){
+  let b = false
   Rigidbodies.forEach(platform => {
-    if(player.yPos + playerSize + player.yVelocity >= platform.y && player.yPos + player.yVelocity <= platform.y + platform.height) return true;
-    //return (player.yPos + playerSize + player.yVelocity >= platform.y && player.yPos + player.yVelocity <= platform.y + platform.height);
-  })
-  return false;
+    let moved = player.yPos + player.yVelocity; 
+    if(lineInt(player.xPos, moved, player.xPos, moved + playerSize, 
+      platform.x, platform.y, platform.x+platform.width, platform.y)){
+      b = true; 
+      return; 
+    } 
+    if(lineInt(player.xPos+playerSize, moved, player.xPos+playerSize, moved + playerSize, 
+      platform.x, platform.y, platform.x+platform.width, platform.y)){
+      b = true;
+      return;
+    } 
+  });
+  return b; 
 }
+
 
 setInterval(handleLogic, 1000/30);
 function handleLogic() {
   players.forEach(player => {
     if(player){
-<<<<<<< HEAD
-      if(checkCollisionX(player) === false){
-        player.xPos += player.xVelocity;
-      }
-      else console.log('x')
-      if(checkCollisionY(player) === false){
-        player.yPos += player.yVelocity;
-      }
-      else console.log('y');
-=======
       if(!checkCollisionTop(player)){
         player.moveY();
       }
@@ -121,7 +111,6 @@ function handleLogic() {
       player.moveX();
       player.jump1();
       
->>>>>>> 11827653f83517417d262d90927342f5cdfe03f7
     }
   })
   io.emit('data', players);
@@ -177,15 +166,23 @@ function disconnect(){
 
 function update(data) {
   players[data.pn].xVelocity = data.vx
-<<<<<<< HEAD
-  players[data.pn].yVelocity = data.vy
-=======
   players[data.pn].jump = data.jump
   console.log(data.vx, data.jump)
->>>>>>> 11827653f83517417d262d90927342f5cdfe03f7
   io.emit('data', players);
 }
 
+// returns true iff the line from (a,b)->(c,d) intersects with (p,q)->(r,s)
+function lineInt(a,b,c,d,p,q,r,s) {
+  var det, gamma, lambda;
+  det = (c - a) * (s - q) - (r - p) * (d - b);
+  if (det === 0) {
+    return false;
+  } else {
+    lambda = ((s - q) * (r - a) + (p - r) * (s - b)) / det;
+    gamma = ((b - d) * (r - a) + (c - a) * (s - b)) / det;
+    return (0 < lambda && lambda < 1) && (0 < gamma && gamma < 1);
+  }
+};
 
 
 
