@@ -52,10 +52,12 @@ class Player {
       this.id = id; 
       this.jump = jump;
   }
-  move() {
+  moveX() {
       this.xPos += this.xVelocity;
-      this.yPos += this.yVelocity;
-      this.yVelocity += 0.2
+  }
+  moveY(){
+    this.yPos += this.yVelocity;
+    this.yVelocity += 0.2
   }
   jump1() {
     if(this.jump > 0){
@@ -108,9 +110,11 @@ function handleLogic() {
   players.forEach(player => {
     if(player){
       if(!checkCollisionTop(player)){
-        player.yPos += player.yVelocity;
+        player.moveY();
       }
-      player.xPos += player.xVelocity;
+
+      player.moveX();
+      player.jump1();
       
     }
   })
@@ -168,7 +172,7 @@ function disconnect(){
 function update(data) {
   players[data.pn].xVelocity = data.vx
   players[data.pn].jump = data.jump
-  console.log(data.jump)
+  console.log(data.vx, data.jump)
   io.emit('data', players);
 }
 
