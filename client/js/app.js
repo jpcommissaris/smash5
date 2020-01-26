@@ -41,7 +41,7 @@ function handleGraphics() {
     players.forEach((p1) => {
         if(p1){
             ctx.fillStyle = 'red';
-            ctx.fillRect(p1.xPos, p1.yPos, 20, 20);
+            ctx.fillRect(p1.xPos, p1.yPos, 40, 40);
         }
         
     })
@@ -114,35 +114,37 @@ window.onload = function() {
 function handleKeyDown(evt){
     let vx = players[pn].xVelocity
     let vy = players[pn].yVelocity
+    let jump = players[pn].jump
     if(this.playernum != -1){
           switch(evt.keyCode){
               case 65: //left
                 vx = -5; 
                 break;
               case 87: //up
-                vy = -5; 
+                if(jump <= 5){
+                    jump += 1;
+                }
                 break;
               case 68://right
                 vx = 5; 
                 break;
               case 83: //down
-                vy = 2; 
+                vy = 1; 
                 break;
           }
       }
       //console.log(vx, vy, pn)
-      socket.emit('update', {vx: vx, vy: vy, pn: pn}); 
+      socket.emit('update', {vx: vx, jump: jump, pn: pn}); 
   }
 
   function handleKeyUp(evt){
     let vx = players[pn].xVelocity
-    let vy = players[pn].yVelocity
+    let jump = players[pn].jump
     if(this.playernum != -1){
         vx = 0
         vy = 1
     }
-    console.log(vx, vy, pn)
-    socket.emit('update', {vx: vx, vy: vy, pn: pn}); 
+    socket.emit('update', {vx: vx, jump: jump, pn: pn}); 
   }
 
 window.addEventListener('resize', () => {

@@ -76,11 +76,10 @@ function createMap(){
 }
 
 function checkCollisionX(player){
-  Rigidbodies.forEach(platform => {
+  return Rigidbodies.forEach(platform => {
     if(player.xPos + playerSize + player.xVelocity >= platform.x || player.xPos + player.xVelocity <= platform.x + platform.width) return true;
     //return (player.xPos + playerSize + player.xVelocity >= platform.x || player.xPos + player.xVelocity <= platform.x + platform.width);
   })
-  return true;
   return false;
 }
 
@@ -89,7 +88,6 @@ function checkCollisionY(player){
     if(player.yPos + playerSize + player.yVelocity >= platform.y && player.yPos + player.yVelocity <= platform.y + platform.height) return true;
     //return (player.yPos + playerSize + player.yVelocity >= platform.y && player.yPos + player.yVelocity <= platform.y + platform.height);
   })
-  return true;
   return false;
 }
 
