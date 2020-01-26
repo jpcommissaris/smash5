@@ -137,13 +137,15 @@ function handleKeyDown(evt){
   }
 
   function handleKeyUp(evt){
-    /*let vx = players[pn].xVelocity
-    let jump = players[pn].jump
-    if(this.playernum != -1){
-        vx = 0
-        vy = 1
-    }*/
-    socket.emit('update', {vx: vx, jump: jump, pn: pn}); 
+    if(players[pn]){
+        let vx = players[pn].xVelocity
+        let jump = players[pn].jump
+        if(this.playernum != -1){
+            vx = 0
+            vy = 1
+        }
+        socket.emit('update', {vx: vx, jump: jump, pn: pn}); 
+    }
   }
 
 window.addEventListener('resize', () => {
