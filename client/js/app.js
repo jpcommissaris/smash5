@@ -123,14 +123,15 @@ function handleKeyDown(evt){
                 break;
               case 87: //up
                 if(players[pn].grounded){
-                    jump = 5;
+                    jump = 4;
                 }
                 break;
               case 68://right
                 vx = 5; 
                 break;
               case 83: //down
-                vy += 1; 
+                jump = 0;
+                vy += 15; 
                 break;
           }
       }
@@ -145,7 +146,7 @@ function handleKeyDown(evt){
             if(evt.keyCode === 65 ||evt.keyCode === 68){
                 vx = 0
             }
-        socket.emit('update', {vx: vx, jump: jump, pn: pn}); 
+        socket.emit('update', {vx: vx, vy: players[pn].yVelocity, jump: jump, pn: pn}); 
     }
   }
 
