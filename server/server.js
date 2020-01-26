@@ -19,6 +19,9 @@ class RigidBody {
       if(type === 'mf'){
         this.create(0,600,900,100, false, false, false);
       }
+      else if(type === 'mc'){
+        this.create(0,0, 900, 5, false, false, false);
+      }
       else if(type === 'pf'){
         this.create(num*100-(num%4)*25, 300+(num%3)*100, 100, 10, false, false, false);
       }
@@ -69,17 +72,18 @@ class Player {
 }
 
 function createPlayer(name, id) {
-  p1 = new Player(50 + (clients*200), 500, 0, 1, name, id);
+  p1 = new Player(50 + (clients*200), 100, 0, 0, name, id);
   return p1;
 }
 
 function createMap(){
   f1 = new RigidBody('mf', 'white');
   Rigidbodies.push(f1);
+  c1 = new RigidBody('mc', 'white');
+  Rigidbodies.push(c1);
   for(let i = 1; i < 9; i++){
     Rigidbodies.push(new RigidBody('pf', 'green', i));
   }
-  
 }
 function checkCollisionTop(player){
   let b = false
@@ -89,28 +93,78 @@ function checkCollisionTop(player){
       platform.x, platform.y, platform.x+platform.width, platform.y)){
       b = true; 
       return; 
-    } 
+      } 
     if(lineInt(player.xPos+playerSize, moved, player.xPos+playerSize, moved + playerSize, 
       platform.x, platform.y, platform.x+platform.width, platform.y)){
       b = true;
       return;
-    } 
+      } 
   });
   return b; 
 }
 
+function checkCollisionBottom(player){
+  let b = false;
+  Rigidbodies.forEach(platform => {
+    let moved = player.yPos + player.yVelocity;
+    if(lineInt(player.xPos, moved, player.xPos, moved + playerSize,
+      platform.x, platform.y+platform.height, platform.x+platform.width, platform.y+platform.height)){
+      b = true;
+      return;
+      }
+    if(lineInt(player.xPos+playerSize, moved, player.xPos+playerSize, moved + playerSize,
+      platform.x, platform.y+platform.height, platform.x+platform.width, platform.y+platform.height)){
+      b = true;
+      return;
+      }
+  })
+}
+
+function checkCollisionLeft(player){
+  let b = false;
+  Rigidbodies.forEach(platform => {
+    let moved = player.xPos + player.xVelocity;
+    if(lineInt(player.yPos, moved, player.yPos, moved + playerSize, 
+      platform.y, platform.x, platform.y+platform.height, platform.x)){
+      b = true; 
+      return; 
+      } 
+    if(lineInt(player.yPos+playerSize, moved, player.yPos+playerSize, moved + playerSize, 
+      platform.y, platform.x, platform.y+platform.height, platform.x)){
+      b = true;
+      return;
+      } 
+  })
+}
+
+function checkCollisionRight(player){
+  let b = false;
+  Rigidbodies.forEach(platform => {
+    let moved = player.xPos + player.xVelocity;
+    if(lineInt(player.yPos, moved, player.yPos, moved + playerSize,
+      platform.y, platform.x+platform.width, platform.y+platform.height, platform.x+platform.width)){
+      b = true;
+      return;
+      }
+    if(lineInt(player.yPos+playerSize, moved, player.yPos+playerSize, moved + playerSize,
+      platform.y, platform.x+platform.width, platform.y+platform.height, platform.x+platform.width)){
+      b = true;
+      return;
+      }
+  })
+}
 
 setInterval(handleLogic, 1000/30);
 function handleLogic() {
   players.forEach(player => {
     if(player){
-      if(!checkCollisionTop(player)){
+      if(!checkCollisionTop(player) && !checkCollisionBottom(player)){
         player.moveY();
       }
-
-      player.moveX();
+      if(!checkCollisionLeft(player) && !checkCollisionRight(player)){
+        player.moveX();
+      }
       player.jump1();
-      
     }
   })
   io.emit('data', players);
