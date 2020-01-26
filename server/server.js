@@ -23,7 +23,7 @@ class RigidBody {
         this.create(0,0, 900, 5, false, false, false);
       }
       else if(type === 'pf'){
-        this.create(num*100-(num%4)*25, 300+(num%3)*100, 100, 10, false, false, false);
+        this.create(num*100-(num%4)*25, 300+(num%3)*100, 100, 20, false, false, false);
       }
       
       //style
@@ -95,12 +95,12 @@ function checkCollisionTop(player){
       platform.x, platform.y, platform.x+platform.width, platform.y)){
       b = true; 
       return; 
-      } 
+    } 
     if(lineInt(player.xPos+playerSize, moved, player.xPos+playerSize, moved + playerSize, 
       platform.x, platform.y, platform.x+platform.width, platform.y)){
       b = true;
       return;
-      } 
+    } 
   });
   player.grounded = b; 
   return b; 
@@ -114,50 +114,54 @@ function checkCollisionBottom(player){
       platform.x, platform.y+platform.height, platform.x+platform.width, platform.y+platform.height)){
       b = true;
       return;
-      }
+    }
     if(lineInt(player.xPos+playerSize, moved, player.xPos+playerSize, moved + playerSize,
       platform.x, platform.y+platform.height, platform.x+platform.width, platform.y+platform.height)){
       b = true;
       return;
-      }
+    }
   })
+  return b;
 }
 
 function checkCollisionLeft(player){
   let b = false;
   Rigidbodies.forEach(platform => {
     let moved = player.xPos + player.xVelocity;
-    if(lineInt(player.yPos, moved, player.yPos, moved + playerSize, 
-      platform.y, platform.x, platform.y+platform.height, platform.x)){
+    if(lineInt(moved, player.yPos, moved, player.yPos+playerSize, 
+      platform.x, platform.y, platform.x, platform.y+platform.height)){
       b = true; 
       return; 
-      } 
-    if(lineInt(player.yPos+playerSize, moved, player.yPos+playerSize, moved + playerSize, 
-      platform.y, platform.x, platform.y+platform.height, platform.x)){
+    } 
+    if(lineInt(moved, player.yPos, moved, player.yPos+playerSize, 
+      platform.x, platform.y+platform.height, platform.x+platform.width, platform.y+platform.height)){
       b = true;
       return;
-      } 
+    } 
   })
+  return b;
 }
 
 function checkCollisionRight(player){
   let b = false;
   Rigidbodies.forEach(platform => {
     let moved = player.xPos + player.xVelocity;
-    if(lineInt(player.yPos, moved, player.yPos, moved + playerSize,
-      platform.y, platform.x+platform.width, platform.y+platform.height, platform.x+platform.width)){
+    if(lineInt(moved+playerSize, player.yPos, moved+playerSize, player.yPos+playerSize,
+      platform.x, platform.y, platform.x+platform.width, platform.y)){
       b = true;
       return;
-      }
-    if(lineInt(player.yPos+playerSize, moved, player.yPos+playerSize, moved + playerSize,
-      platform.y, platform.x+platform.width, platform.y+platform.height, platform.x+platform.width)){
+    }
+    if(lineInt(moved+playerSize, player.yPos, moved+playerSize, player.yPos+playerSize,
+      platform.x, platform.y+platform.height, platform.x+platform.width, platform.y+platform.height)){
       b = true;
       return;
-      }
+    }
   })
+  return b;
 }
 
 setInterval(handleLogic, 1000/30);
+
 function handleLogic() {
   players.forEach(player => {
     if(player){
