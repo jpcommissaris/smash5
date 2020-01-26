@@ -125,7 +125,7 @@ function checkCollisionLeft(player){
   Rigidbodies.forEach(platform => {
     let moved = player.xPos + player.xVelocity;
     if(lineInt(moved, player.yPos, moved, player.yPos+playerSize, 
-      platform.x, platform.y, platform.x, platform.y+platform.height)){
+      platform.x, platform.y, platform.x+platform.width, platform.y)){
       b = true; 
       return; 
     } 
@@ -161,13 +161,14 @@ setInterval(handleLogic, 1000/30);
 function handleLogic() {
   players.forEach(player => {
     if(player){
-      if(!checkCollisionTop(player)){
+      if(!checkCollisionTop(player) && !checkCollisionBottom(player)){
         player.moveY();
       }else{
         player.yVelocity = 0;
       }
-
-      player.moveX();
+      if(!checkCollisionLeft(player) && !checkCollisionRight(player)){
+        player.moveX();
+      }
       player.jump1();
       
     }
