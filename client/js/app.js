@@ -1,3 +1,5 @@
+
+
 let playerName;
 let playerNameInput = document.getElementById('playerNameInput');
 const MAX_CONNS = 8; 
@@ -14,6 +16,7 @@ canv.height = window.innerHeight;
 
 let players = [];
 let RigidBodies = [];
+let bullets = [];
 let pn = null; 
 let center = {x: 0, y: 0}
 
@@ -47,6 +50,10 @@ function drawCursor(){
 }
 
 function gameloop() {
+    socket.on('bulletdata', (data) =>{
+        bullets = data;
+    });
+
     socket.on('data', (data) => {
         players = data;
         if(players[pn]){
@@ -59,6 +66,14 @@ function gameloop() {
 
 function handleGraphics() {
     drawStage();
+    bullets.forEach((b1) => {
+        if(b1){
+            ctx.fillStyle = 'purple';
+            ctx.fillRect(b1.xPos, b1.yPos, 8,8);
+        }
+        
+    })
+
     players.forEach((p1) => {
         if(p1){
             ctx.fillStyle = 'red';
@@ -88,8 +103,8 @@ function startGame() {
     })
     socket.on('pn', (data) => {
         pn = data; 
-        center.x = players[pn].xPos + 20;
-        center.y = players[pn].yPos + 20;
+        center.x = players[pn].posX + 20;
+        center.y = players[pn].posY + 20;
     })
     
     gameloop();     
@@ -139,6 +154,7 @@ function handleKeyDown(evt){
     let vx = players[pn].xVelocity;
     let vy = players[pn].yVelocity;
     let jump = players[pn].jump;
+    let reload = players[pn].reload;
 
     if(this.playernum != -1){
           switch(evt.keyCode){
@@ -157,10 +173,12 @@ function handleKeyDown(evt){
                 jump = 0;
                 vy += 15; 
                 break;
+              case 82: //r for reload
+                reload = 0; 
           }
       }
       //console.log(vx, vy, pn)
-      socket.emit('update', {vx: vx, vy: vy, jump: jump, pn: pn}); 
+      socket.emit('update', {vx: vx, vy: vy, jump: jump, pn: pn, reload: reload}); 
   }
 
   function handleKeyUp(evt){
@@ -170,13 +188,19 @@ function handleKeyDown(evt){
             if(evt.keyCode === 65 ||evt.keyCode === 68){
                 vx = 0
             }
-        socket.emit('update', {vx: vx, vy: players[pn].yVelocity, jump: jump, pn: pn}); 
+        socket.emit('update', {vx: vx, vy: players[pn].yVelocity, jump: jump, pn: pn, reload: players[pn].reload}); 
     }
   }
 
 window.addEventListener('click', (evt) => {
-    console.log(evt.clientX, evt.clientY)
-    console.log('hi')
+    let dy = evt.clientY - center.y;
+    let dx = evt.clientX - center.x;
+    let v = 20; 
+    let theta = Math.atan2(dy, dx); // range (-PI, PI]
+    let vx = Math.round(v*Math.cos(theta),2);
+    let vy = Math.round(v*Math.sin(theta),2);
+
+    socket.emit('bullet', {posX: center.x, posY: center.y,vx: vx, vy:vy, pn: pn}); 
 })
 window.addEventListener('mousemove', (evt) => {
     mouse.x = evt.clientX
