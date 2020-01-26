@@ -19,9 +19,6 @@ class RigidBody {
       if(type === 'mf'){
         this.create(0,600,900,100, false, false, false);
       }
-      else if(type === 'mc'){
-        this.create(0,0, 900, 5, false, false, false);
-      }
       else if(type === 'pf'){
         this.create(num*100-(num%4)*25, 300+(num%3)*100, 100, 20, false, false, false);
       }
@@ -59,8 +56,8 @@ class Player {
       this.xPos += this.xVelocity;
   }
   moveY(){
-    this.yPos += this.yVelocity;
-    this.yVelocity += 0.2
+      this.yPos += this.yVelocity;
+      this.yVelocity += 0.3
   }
   moveLeft() {
       this.xPos -= this.xVelocity;
@@ -74,18 +71,17 @@ class Player {
 }
 
 function createPlayer(name, id) {
-  p1 = new Player(50 + (clients*200), 100, 0, 0, name, id);
+  p1 = new Player(50 + (clients*200), 500, 0, 1, name, id);
   return p1;
 }
 
 function createMap(){
   f1 = new RigidBody('mf', 'white');
   Rigidbodies.push(f1);
-  c1 = new RigidBody('mc', 'white');
-  Rigidbodies.push(c1);
   for(let i = 1; i < 9; i++){
     Rigidbodies.push(new RigidBody('pf', 'green', i));
   }
+  
 }
 function checkCollisionTop(player){
   let b = false
@@ -165,13 +161,15 @@ setInterval(handleLogic, 1000/30);
 function handleLogic() {
   players.forEach(player => {
     if(player){
-      if(!checkCollisionTop(player) && !checkCollisionBottom(player)){
+      if(!checkCollisionTop(player)){
         player.moveY();
+      }else{
+        player.yVelocity = 0;
       }
-      if(!checkCollisionLeft(player) && !checkCollisionRight(player)){
-        player.moveX();
-      }
+
+      player.moveX();
       player.jump1();
+      
     }
   })
   io.emit('data', players);
@@ -227,7 +225,7 @@ function disconnect(){
 
 function update(data) {
   players[data.pn].xVelocity = data.vx
-  //players[data.pn].yVelocity = data.vy
+  players[data.pn].yVelocity = data.vy
   players[data.pn].jump = data.jump
   io.emit('data', players);
 }

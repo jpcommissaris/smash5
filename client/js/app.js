@@ -15,6 +15,9 @@ canv.height = window.innerHeight;
 let players = [];
 let RigidBodies = [];
 let pn = null; 
+let center = {x: 0, y: 0}
+
+const mouse = {x: 0, y: 0}
 
 
 
@@ -28,10 +31,28 @@ function drawStage(){
     })
 
 }
+function drawCursor(){
+    ctx.fillStyle = "blue";
+    ctx.fillRect(mouse.x-5,mouse.y-5,10,10);
+    let dy = mouse.y - center.y;
+    let dx = mouse.x - center.x;
+    let theta = Math.atan2(dy, dx); // range (-PI, PI]
+    //change relative origin and rotate, then change back
+    ctx.save()
+    ctx.translate(center.x, center.y)
+    ctx.rotate(theta)
+    ctx.fillRect(0, 0, 30, 5)
+    ctx.restore();
+
+}
 
 function gameloop() {
     socket.on('data', (data) => {
         players = data;
+        if(players[pn]){
+            center.x = players[pn].xPos + 20;
+            center.y = players[pn].yPos + 12;
+        }
         handleGraphics(); 
     }); 
 }
@@ -45,6 +66,7 @@ function handleGraphics() {
         }
         
     })
+    drawCursor(); 
 }
 
 
@@ -66,6 +88,8 @@ function startGame() {
     })
     socket.on('pn', (data) => {
         pn = data; 
+        center.x = players[pn].xPos + 20;
+        center.y = players[pn].yPos + 20;
     })
     
     gameloop();     
@@ -123,14 +147,15 @@ function handleKeyDown(evt){
                 break;
               case 87: //up
                 if(players[pn].grounded){
-                    jump = 5;
+                    jump = 4;
                 }
                 break;
               case 68://right
                 vx = 5; 
                 break;
               case 83: //down
-                vy += 1; 
+                jump = 0;
+                vy += 15; 
                 break;
           }
       }
@@ -145,9 +170,18 @@ function handleKeyDown(evt){
             if(evt.keyCode === 65 ||evt.keyCode === 68){
                 vx = 0
             }
-        socket.emit('update', {vx: vx, jump: jump, pn: pn}); 
+        socket.emit('update', {vx: vx, vy: players[pn].yVelocity, jump: jump, pn: pn}); 
     }
   }
+
+window.addEventListener('click', (evt) => {
+    console.log(evt.clientX, evt.clientY)
+    console.log('hi')
+})
+window.addEventListener('mousemove', (evt) => {
+    mouse.x = evt.clientX
+    mouse.y = evt.clientY
+}); 
 
 window.addEventListener('resize', () => {
     canv.width = window.innerWidth;
