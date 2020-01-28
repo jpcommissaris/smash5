@@ -1,12 +1,12 @@
-
-
-let playerName;
-let playerNameInput = document.getElementById('playerNameInput');
-const MAX_CONNS = 8; 
-
+// -- socket setup -- 
 let socket;
 socket = io();
+const MAX_CONNS = 8; 
+// -- player naming -- 
+let playerName;
+let playerNameInput = document.getElementById('playerNameInput');
 
+// -- canvas setup -- 
 let canv = document.getElementById('cvs');
 let ctx = canv.getContext('2d');
 ctx.font = '28px Arial'; 
@@ -14,17 +14,20 @@ ctx.font = '28px Arial';
 canv.width = window.innerWidth;
 canv.height = window.innerHeight;
 
+// -- variables recieve by server  -- 
 let players = [];
 let RigidBodies = [];
 let bullets = [];
 let pn = null; 
-let center = {x: 0, y: 0}
-let playerSize = 40;
 
+// -- other client varaibles -- 
+const center = {x: 0, y: 0}
+const playerSize = 40;
 const mouse = {x: 0, y: 0}
 
-
-
+// ====================================
+// =   Graphics and Draw Functions    =
+// ====================================
 
 function drawStage(){
     ctx.fillStyle = "black";
@@ -41,15 +44,48 @@ function drawCursor(){
     let dy = mouse.y - center.y;
     let dx = mouse.x - center.x;
     let theta = Math.atan2(dy, dx); // range (-PI, PI]
-    //change relative origin and rotate, then change back
-    ctx.save()
+    ctx.save() // save change relative origin and rotate, then change back
     ctx.translate(center.x, center.y)
     ctx.rotate(theta)
     ctx.fillRect(0, 0, 30, 5)
     ctx.restore();
 
 }
+function drawBullets(){
+    bullets.forEach((b1) => {
+        if(b1){
+            ctx.fillStyle = 'purple';
+            ctx.fillRect(b1.xPos, b1.yPos, 8,8);
+        }
+        
+    })
+}
+function drawPlayers(){
+    players.forEach((p1) => {
+        if(p1){
+            ctx.fillStyle = 'yellow';
+            ctx.fillRect(p1.xPos, p1.yPos, playerSize, playerSize);
+            ctx.fillStyle = 'red'
+            ctx.fillRect(p1.xPos, p1.yPos-10, playerSize*(p1.health/100), 5);
+            ctx.fillStyle = "orange"
+            ctx.fillText(p1.name, p1.xPos, p1.yPos-14);
+        }
+    })
+}
 
+// main graphics loop 
+function handleGraphics() {
+    drawStage();
+    drawBullets(); 
+    drawPlayers(); 
+    drawCursor(); 
+}
+
+// ====================================
+// =       Game Setup and Loop        =
+// ====================================
+
+// this needs to be changed to just one socket.on 
 function gameloop() {
     socket.on('bulletdata', (data) =>{
         bullets = data;
@@ -63,29 +99,6 @@ function gameloop() {
         }
         handleGraphics(); 
     }); 
-}
-
-function handleGraphics() {
-    drawStage();
-    bullets.forEach((b1) => {
-        if(b1){
-            ctx.fillStyle = 'purple';
-            ctx.fillRect(b1.xPos, b1.yPos, 8,8);
-        }
-        
-    })
-
-    players.forEach((p1) => {
-        if(p1){
-            ctx.fillStyle = 'yellow';
-            ctx.fillRect(p1.xPos, p1.yPos, playerSize, playerSize);
-            ctx.fillStyle = 'red'
-            ctx.fillRect(p1.xPos, p1.yPos-10, playerSize*(p1.health/100), 5);
-            ctx.fillStyle = "orange"
-            ctx.fillText(p1.name, p1.xPos, p1.yPos-14);
-        }
-    })
-    drawCursor(); 
 }
 
 // -- menu screen and setup -- 
@@ -148,9 +161,9 @@ window.onload = function() {
 
 
 
-// -- event listeners --
-
-
+// ====================================
+// =   Event Listeners & Handlers     =
+// ====================================
 
 function handleKeyDown(evt){
     let vx = players[pn].xVelocity;
@@ -205,15 +218,15 @@ window.addEventListener('click', (evt) => {
     socket.emit('bullet', {posX: center.x, posY: center.y,vx: vx, vy:vy, pn: pn}); 
 })
 window.addEventListener('mousemove', (evt) => {
-    mouse.x = evt.clientX
-    mouse.y = evt.clientY
+    mouse.x = evt.clientX;
+    mouse.y = evt.clientY;
 }); 
 
 window.addEventListener('resize', () => {
     canv.width = window.innerWidth;
     canv.height = window.innerHeight;
-    size = canv.width/(tc[0]+2)
-    sizeH = canv.height/(tc[1]+2)
+    size = canv.width/(tc[0]+2);
+    sizeH = canv.height/(tc[1]+2);
     gameRect = [size, size, size*tc[0], size*tc[1]];
     drawStage()
 }, true);

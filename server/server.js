@@ -1,5 +1,6 @@
 //https://socket.io/docs/emit-cheatsheet/
 
+//-- server configuration -- 
 const express = require('express');
 const app     = express();
 const http    = require('http').Server(app);
@@ -7,13 +8,17 @@ const io  = require('socket.io')(http);
 const config  = require('./config.json');
 const MAX_CONNS = 4; 
 
+// -- lists being sent over sockets --
 const Rigidbodies = []; 
 const players = [null, null, null, null];
 const bullets = []; 
+
+// -- other server variables -- 
 let clients = 0; 
-
 const playerSize = 40;
-
+// ====================================
+// =            Game Objects          =
+// ====================================
 class RigidBody {
   constructor(type = 'mf', color = 'white', num = 0){
       //type
@@ -91,6 +96,10 @@ class Bullet{
 
 }
 
+// ====================================
+// =            Object Creation       =
+// ====================================
+
 function createPlayer(name, id) {
   p1 = new Player(50 + (clients*200), 500, 0, 1, name, id);
   return p1;
@@ -107,6 +116,10 @@ function createMap(){
   }
   
 }
+
+// ====================================
+// =        Check Collision           =
+// ====================================
 function checkCollisionTop(player){
   let b = false
   Rigidbodies.forEach(platform => {
@@ -181,6 +194,10 @@ function checkCollisionRight(player){
   return b;
 }
 
+// ====================================
+// =           Game Logic             =
+// ====================================
+
 setInterval(handleLogic, 1000/30);
 
 function handleLogic() {
@@ -210,7 +227,12 @@ function handleLogic() {
   io.emit('data', players);
 
 }
-//setup server
+
+// ====================================
+// =           Server Setup           =
+// ====================================
+
+
 app.use(express.static(__dirname + '/../client'));
 
 const serverPort = process.env.PORT || config.port;
@@ -219,6 +241,9 @@ http.listen(serverPort, () => {
   createMap();
 });
 
+// ====================================
+// =        Socket Handling           =
+// ====================================
 
 io.on('connection', (socket) => {
   console.log('New connection with id ' + socket.id)
@@ -268,6 +293,10 @@ function update(data) {
   players[data.pn].jump = data.jump
   io.emit('data', players);
 }
+
+// ====================================
+// =        Helper Functions          =
+// ====================================
 
 // returns true iff the line from (a,b)->(c,d) intersects with (p,q)->(r,s)
 function lineInt(a,b,c,d,p,q,r,s) {
