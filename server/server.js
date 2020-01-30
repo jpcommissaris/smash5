@@ -48,18 +48,11 @@ class RigidBody {
 }
 
 class Player {
-  constructor(xPos, yPos, xVelocity, yVelocity, name, id, health){
-      this.xPos = xPos;
-      this.yPos = yPos;
-      this.xVelocity = xVelocity;
-      this.yVelocity = yVelocity;
+  constructor(xPos, yPos, xVelocity, yVelocity, name, id){
       this.name = name;
       this.id = id; 
-      this.jump = 0;
-
-      this.grounded = false; 
-      this.reload = 6;
-      this.health = 100;
+      // spawn a new player
+      this.respawn(xPos, yPos, xVelocity, yVelocity);
   }
   moveX() {
       this.xPos += this.xVelocity;
@@ -76,6 +69,17 @@ class Player {
       this.yVelocity -= this.jump
       this.jump -= 1
     }
+  }
+  respawn(xPos, yPos, xVelocity, yVelocity){
+      this.xPos = xPos;
+      this.yPos = yPos;
+      this.xVelocity = xVelocity;
+      this.yVelocity = yVelocity;
+      this.jump = 0;
+
+      this.grounded = false; 
+      this.reload = 6;
+      this.health = 100;
   }
 }
 
@@ -194,6 +198,23 @@ function checkCollisionRight(player){
   return b;
 }
 
+function checkDeath(player){
+  if(player.yPos > 1000 || player.health <= 0){
+    player.respawn(50 + (clients*200), 500, 0, 1);
+  }
+}
+
+function checkCollision(player){
+  if(!checkCollisionTop(player) && !checkCollisionBottom(player)){
+    player.moveY();
+  }else{
+    player.yVelocity = 0;
+  }
+  if(!checkCollisionLeft(player) && !checkCollisionRight(player)){
+    player.moveX();
+  }
+}
+
 // ====================================
 // =           Game Logic             =
 // ====================================
@@ -201,20 +222,16 @@ function checkCollisionRight(player){
 setInterval(handleLogic, 1000/30);
 
 function handleLogic() {
+  // loop through players
   players.forEach(player => {
     if(player){
-      if(!checkCollisionTop(player) && !checkCollisionBottom(player)){
-        player.moveY();
-      }else{
-        player.yVelocity = 0;
-      }
-      if(!checkCollisionLeft(player) && !checkCollisionRight(player)){
-        player.moveX();
-      }
+      checkDeath(player)
+      checkCollision(player);
       player.jump1();
-      
     }
   })
+
+  //loop through bullets 
   bullets.forEach(bullet =>{
     if(bullet){
       bullet.move();
