@@ -16,6 +16,7 @@ const bullets = [];
 // -- other server variables -- 
 let clients = 0; 
 const playerSize = 40;
+const gameSize = {x: 900, y: 600}
 // ====================================
 // =            Game Objects          =
 // ====================================
@@ -44,22 +45,25 @@ class RigidBody {
     this.jumpThrough=b2;
     this.invisible=b3;
   }
+  //checks if a given x,y is inside rigidbody 
+  isIn(x, y){
+    if(x > this.x && x < this.x + this.width){
+      if(y > this.y && y < this.y+this.height){
+        return true; 
+      }
+    }
+    return false; 
+  }
 
 }
 
 class Player {
-  constructor(xPos, yPos, xVelocity, yVelocity, name, id, health){
-      this.xPos = xPos;
-      this.yPos = yPos;
-      this.xVelocity = xVelocity;
-      this.yVelocity = yVelocity;
+  constructor(xPos, yPos, xVelocity, yVelocity, name, id, pn){
       this.name = name;
       this.id = id; 
-      this.jump = 0;
-
-      this.grounded = false; 
-      this.reload = 6;
-      this.health = 100;
+      this.pn = pn
+      // spawn a new player
+      this.respawn(xPos, yPos, xVelocity, yVelocity);
   }
   moveX() {
       this.xPos += this.xVelocity;
@@ -77,6 +81,25 @@ class Player {
       this.jump -= 1
     }
   }
+  respawn(xPos, yPos, xVelocity, yVelocity){
+      this.xPos = xPos;
+      this.yPos = yPos;
+      this.xVelocity = xVelocity;
+      this.yVelocity = yVelocity;
+      this.jump = 0;
+
+      this.grounded = false; 
+      this.reload = 6;
+      this.health = 100;
+  }
+  isIn(x, y){
+    if(x > this.xPos && x < this.xPos + playerSize){
+      if(y > this.yPos && y < this.yPos + playerSize){
+        return true; 
+      }
+    }
+    return false; 
+  }
 }
 
 class Bullet{
@@ -93,15 +116,43 @@ class Bullet{
     this.yPos += this.yVelocity;
     this.yVelocity += 0.1
   }
+  checkBulletCollision(){
+    //check map collisions
+    if(this.xPos < -10 || this.xPos > gameSize.x + 10
+      || this.yPos < -10 || this.yPos > gameSize.y +10){
+        bullets.splice(bullets.indexOf(this), 1); //delete the bullet
+        return; 
+    } 
+    //check rb collisions
+    Rigidbodies.forEach(platform => {
+      if(platform){
+        if(platform.isIn(this.xPos, this.yPos)){
+          bullets.splice(bullets.indexOf(this), 1); //delete the bullet
+          return; 
+        }
+      }
+    });
+    //check other player collisions
+    players.forEach(player => {
+      if(player && player.pn != this.pn){
+        if(player.isIn(this.xPos, this.yPos)){
+          bullets.splice(bullets.indexOf(this), 1); //delete the bullet
+          player.health -= 10; 
+          return; 
+        }
+      }
+    });
+
+  }
 
 }
 
 // ====================================
-// =            Object Creation       =
+// =         Object Creation          =
 // ====================================
 
-function createPlayer(name, id) {
-  p1 = new Player(50 + (clients*200), 500, 0, 1, name, id);
+function createPlayer(name, id, pn) {
+  p1 = new Player(50 + (clients*200), 500, 0, 1, name, id, pn);
   return p1;
 }
 function createBullet(posX, posY, xVelocity, yVelocity, pn){
@@ -194,6 +245,23 @@ function checkCollisionRight(player){
   return b;
 }
 
+function checkDeath(player){
+  if(player.yPos > 1000 || player.health <= 0){
+    player.respawn(50 + (clients*200), 500, 0, 1);
+  }
+}
+
+function checkCollision(player){
+  if(!checkCollisionTop(player) && !checkCollisionBottom(player)){
+    player.moveY();
+  }else{
+    player.yVelocity = 0;
+  }
+  if(!checkCollisionLeft(player) && !checkCollisionRight(player)){
+    player.moveX();
+  }
+}
+
 // ====================================
 // =           Game Logic             =
 // ====================================
@@ -201,23 +269,20 @@ function checkCollisionRight(player){
 setInterval(handleLogic, 1000/30);
 
 function handleLogic() {
+  // loop through players
   players.forEach(player => {
     if(player){
-      if(!checkCollisionTop(player) && !checkCollisionBottom(player)){
-        player.moveY();
-      }else{
-        player.yVelocity = 0;
-      }
-      if(!checkCollisionLeft(player) && !checkCollisionRight(player)){
-        player.moveX();
-      }
+      checkDeath(player)
+      checkCollision(player);
       player.jump1();
-      
     }
   })
+
+  //loop through bullets 
   bullets.forEach(bullet =>{
     if(bullet){
       bullet.move();
+      bullet.checkBulletCollision()
     }
   })
   if(bullets.length > 20){
@@ -259,7 +324,7 @@ function addPlayer(data){
   for(let i = 0; i < MAX_CONNS; i++){
     if(players[i] === null){
       console.log('User joined game'); 
-      players[i] = createPlayer(data.playerName, this.id);
+      players[i] = createPlayer(data.playerName, this.id, i);
       this.emit('pn', i);
       clients++;
       break;

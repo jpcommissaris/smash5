@@ -47,7 +47,7 @@ function drawCursor(){
     ctx.save() // save change relative origin and rotate, then change back
     ctx.translate(center.x, center.y)
     ctx.rotate(theta)
-    ctx.fillRect(0, 0, 30, 5)
+    ctx.fillRect(-4, -4, 30, 5)
     ctx.restore();
 
 }
@@ -55,7 +55,7 @@ function drawBullets(){
     bullets.forEach((b1) => {
         if(b1){
             ctx.fillStyle = 'purple';
-            ctx.fillRect(b1.xPos, b1.yPos, 8,8);
+            ctx.fillRect(b1.xPos-4, b1.yPos-4, 8,8);
         }
         
     })
