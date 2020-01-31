@@ -152,7 +152,7 @@ class Bullet{
 // ====================================
 
 function createPlayer(name, id, pn) {
-  p1 = new Player(50 + (clients*200), 500, 0, 1, name, id, pn);
+  p1 = new Player(50 + (pn*200), 100, 0, 1, name, id, pn);
   return p1;
 }
 function createBullet(posX, posY, xVelocity, yVelocity, pn){
@@ -246,8 +246,8 @@ function checkCollisionRight(player){
 }
 
 function checkDeath(player){
-  if(player.yPos > 1000 || player.health <= 0){
-    player.respawn(50 + (clients*200), 500, 0, 1);
+  if(player && (player.yPos > 1000 || player.health <= 0)){
+    player.respawn(50 + (player.pn*200), 100, 0, 1);
   }
 }
 
