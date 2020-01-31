@@ -16,6 +16,7 @@ const bullets = [];
 // -- other server variables -- 
 let clients = 0; 
 const playerSize = 40;
+const gameSize = {x: 900, y: 600}
 // ====================================
 // =            Game Objects          =
 // ====================================
@@ -116,18 +117,28 @@ class Bullet{
     this.yVelocity += 0.1
   }
   checkBulletCollision(){
+    //check map collisions
+    if(this.xPos < -10 || this.xPos > gameSize.x + 10
+      || this.yPos < -10 || this.yPos > gameSize.y +10){
+        bullets.splice(bullets.indexOf(this), 1); //delete the bullet
+        return; 
+    } 
+    //check rb collisions
     Rigidbodies.forEach(platform => {
       if(platform){
         if(platform.isIn(this.xPos, this.yPos)){
           bullets.splice(bullets.indexOf(this), 1); //delete the bullet
+          return; 
         }
       }
     });
+    //check other player collisions
     players.forEach(player => {
       if(player && player.pn != this.pn){
         if(player.isIn(this.xPos, this.yPos)){
           bullets.splice(bullets.indexOf(this), 1); //delete the bullet
           player.health -= 10; 
+          return; 
         }
       }
     });
