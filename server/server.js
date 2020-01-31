@@ -44,13 +44,23 @@ class RigidBody {
     this.jumpThrough=b2;
     this.invisible=b3;
   }
+  //checks if a given x,y is inside rigidbody 
+  isIn(x, y){
+    if(x > this.x && x < this.x + this.width){
+      if(y > this.y && y < this.y+this.height){
+        return true; 
+      }
+    }
+    return false; 
+  }
 
 }
 
 class Player {
-  constructor(xPos, yPos, xVelocity, yVelocity, name, id){
+  constructor(xPos, yPos, xVelocity, yVelocity, name, id, pn){
       this.name = name;
       this.id = id; 
+      this.pn = pn
       // spawn a new player
       this.respawn(xPos, yPos, xVelocity, yVelocity);
   }
@@ -81,6 +91,14 @@ class Player {
       this.reload = 6;
       this.health = 100;
   }
+  isIn(x, y){
+    if(x > this.xPos && x < this.xPos + playerSize){
+      if(y > this.yPos && y < this.yPos + playerSize){
+        return true; 
+      }
+    }
+    return false; 
+  }
 }
 
 class Bullet{
@@ -97,15 +115,33 @@ class Bullet{
     this.yPos += this.yVelocity;
     this.yVelocity += 0.1
   }
+  checkBulletCollision(){
+    Rigidbodies.forEach(platform => {
+      if(platform){
+        if(platform.isIn(this.xPos, this.yPos)){
+          bullets.splice(bullets.indexOf(this), 1); //delete the bullet
+        }
+      }
+    });
+    players.forEach(player => {
+      if(player && player.pn != this.pn){
+        if(player.isIn(this.xPos, this.yPos)){
+          bullets.splice(bullets.indexOf(this), 1); //delete the bullet
+          player.health -= 10; 
+        }
+      }
+    });
+
+  }
 
 }
 
 // ====================================
-// =            Object Creation       =
+// =         Object Creation          =
 // ====================================
 
-function createPlayer(name, id) {
-  p1 = new Player(50 + (clients*200), 500, 0, 1, name, id);
+function createPlayer(name, id, pn) {
+  p1 = new Player(50 + (clients*200), 500, 0, 1, name, id, pn);
   return p1;
 }
 function createBullet(posX, posY, xVelocity, yVelocity, pn){
@@ -235,6 +271,7 @@ function handleLogic() {
   bullets.forEach(bullet =>{
     if(bullet){
       bullet.move();
+      bullet.checkBulletCollision()
     }
   })
   if(bullets.length > 20){
@@ -276,7 +313,7 @@ function addPlayer(data){
   for(let i = 0; i < MAX_CONNS; i++){
     if(players[i] === null){
       console.log('User joined game'); 
-      players[i] = createPlayer(data.playerName, this.id);
+      players[i] = createPlayer(data.playerName, this.id, i);
       this.emit('pn', i);
       clients++;
       break;
